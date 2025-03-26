@@ -22,3 +22,14 @@ from typing import Tuple
 def get_min_max(filename: str) -> Tuple[int, int]:
     ...
 
+def get_min_max(filename):
+    min_val = float('inf') 
+    max_val = float('-inf')
+    with open(filename) as opened_file:
+        for line in opened_file:
+            num = int(line.strip())
+            min_val = min(min_val, num)
+            max_val = max(max_val, num)
+    return (min_val, max_val)
+
+print(get_min_max('file.txt'))
