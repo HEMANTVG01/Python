@@ -21,3 +21,19 @@ def read_numbers(n: int) -> str:
     ...
 
 
+def read_numbers(n):
+    numbers = []
+    for _ in range(n):
+        user_input = input()
+        try:
+            number = float(user_input)  
+            numbers.append(number)  
+        except ValueError:
+            continue  
+    if numbers:
+        avg = sum(numbers) / len(numbers)  
+        return f"Avg: {avg:.2f}" 
+    else:
+        return "No numbers entered"  
+
+print(read_numbers(5))
