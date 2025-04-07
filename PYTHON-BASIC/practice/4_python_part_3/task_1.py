@@ -22,3 +22,18 @@ Write tests for calculate_days function
 Note that all tests should pass regardless of the day test was run
 Tip: for mocking datetime.now() use https://pypi.org/project/pytest-freezegun/
 """
+
+import datetime
+def calculate_days(date_str):
+    try:
+        custom_date = datetime.datetime.strptime(date_str, '%Y-%m-%d').date()
+        current_date = datetime.date.today()
+        delta = custom_date - current_date
+        return delta.days
+    
+    except ValueError:
+        raise ValueError("Date format must be 'YYYY-MM-DD'")
+
+print(calculate_days('2021-10-07'))  
+print(calculate_days('2021-10-05'))  
+print(calculate_days('10-07-2021')) 
