@@ -24,6 +24,10 @@ Tip: for mocking datetime.now() use https://pypi.org/project/pytest-freezegun/
 """
 
 import datetime
+
+class WrongFormatException(Exception):
+    pass
+
 def calculate_days(date_str):
     try:
         custom_date = datetime.datetime.strptime(date_str, '%Y-%m-%d').date()
@@ -32,8 +36,8 @@ def calculate_days(date_str):
         return delta.days
     
     except ValueError:
-        raise ValueError("Date format must be 'YYYY-MM-DD'")
+        raise WrongFormatException(f"Date format must be 'YYYY-MM-DD'")
 
 print(calculate_days('2021-10-07'))  
 print(calculate_days('2021-10-05'))  
-print(calculate_days('10-07-2021')) 
+print(calculate_days('10-07-2021'))  
