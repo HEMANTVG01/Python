@@ -30,3 +30,45 @@ Example:
     >>> m.method()
     123
 """
+
+import sys
+import argparse
+from faker import Faker
+
+def generate_fake_data(number_of_instances, fields):
+    fake = Faker()
+    fake_data = []
+
+    for _ in range(number_of_instances):
+        data = {}
+        for field, provider in fields.items():
+            provider_func = getattr(fake, provider)
+            data[field] = provider_func()
+        fake_data.append(data)
+    
+    return fake_data
+
+def main():
+    parser = argparse.ArgumentParser(description="Generate fake data.")
+    parser.add_argument("number", type=int, help="Number of instances to generate")
+    
+    parser.add_argument(
+        "fields_and_providers", 
+        nargs="+", 
+        help="Fields and their respective providers (e.g., --name=name --address=address)"
+    )
+    
+    args = parser.parse_args()
+
+    fields = {}
+    for field_and_provider in args.fields_and_providers:
+        field, provider = field_and_provider.split('=')
+        fields[field] = provider
+
+    fake_data = generate_fake_data(args.number, fields)
+
+    for entry in fake_data:
+        print(entry)
+
+if __name__ == "__main__":
+    main()
