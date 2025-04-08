@@ -24,3 +24,15 @@ Example:
     >>> m.method2()
     b'some text'
 """
+import urllib.request
+
+def make_request(url):
+    with urllib.request.urlopen(url) as response:
+        status_code = response.getcode()
+        data = response.read().decode('utf-8')
+        return status_code, data
+
+url = "https://example.com"
+status_code, data = make_request(url)
+print(f"Status Code: {status_code}")
+print(f"Response Data: {data[:200]}...")  # Print first 200 characters of the response
