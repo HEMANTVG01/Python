@@ -9,3 +9,123 @@
     <Vitebsk mean_temp="9.22" mean_wind_speed="4.26" min_temp="5.81" min_wind_speed="2" max_temp="12.08" max_wind_speed="6"/>
   </cities>
 </weather>
+
+
+
+### Solution ##
+
+import os
+import json
+import xml.etree.ElementTree as ET
+from statistics import mean
+from pathlib import Path
+
+DATA_DIR = "/Users/hhemantvg/Documents/task6/source_data copy"  
+OUTPUT_FILE = "Barcelona_weather_summary.xml"
+OBSERVATION_DATE = "2021-09-25"
+COUNTRY_NAME = "Barcelona"
+
+def parse_city_weather(city_path):
+    json_files = list(Path(city_path).glob("*.json"))
+    if not json_files:
+        return None
+
+    with open(json_files[0], "r") as file:
+        data = json.load(file)
+
+    temps = [hour["temp"] for hour in data["hourly"]]
+    winds = [hour["wind_speed"] for hour in data["hourly"]]
+
+    return {
+        "mean_temp": round(mean(temps), 2),
+        "max_temp": round(max(temps), 2),
+        "min_temp": round(min(temps), 2),
+        "mean_wind": round(mean(winds), 2),
+        "max_wind": round(max(winds), 2),
+        "min_wind": round(min(winds), 2),
+    }
+
+def build_xml(data_by_city, output_file):
+    # Country-wide summary
+    mean_temps = {city: data["mean_temp"] for city, data in data_by_city.items()}
+    mean_winds = {city: data["mean_wind"] for city, data in data_by_city.items()}
+
+    country_mean_temp = round(mean(mean_temps.values()), 2)
+    country_mean_wind = round(mean(mean_winds.values()), 2)
+
+    warmest_city = max(mean_temps, key=mean_temps.get)
+    coldest_city = min(mean_temps, key=mean_temps.get)
+    windiest_city = max(mean_winds, key=mean_winds.get)
+
+    # Root element
+    weather_el = ET.Element("weather", attrib={
+        "country": COUNTRY_NAME,
+        "date": OBSERVATION_DATE,
+    })
+
+    summary_el = ET.SubElement(weather_el, "summary", attrib={
+        "mean_temp": str(country_mean_temp),
+        "mean_wind_speed": str(country_mean_wind),
+        "coldest_place": coldest_city,
+        "warmest_place": warmest_city,
+        "windiest_place": windiest_city
+    })
+
+    cities_el = ET.SubElement(weather_el, "cities")
+
+    for city, stats in sorted(data_by_city.items()):
+        city_el = ET.SubElement(cities_el, city, attrib={
+            "mean_temp": str(stats["mean_temp"]),
+            "max_temp": str(stats["max_temp"]),
+            "min_temp": str(stats["min_temp"]),
+            "mean_wind_speed": str(stats["mean_wind"]),
+            "max_wind_speed": str(stats["max_wind"]),
+            "min_wind_speed": str(stats["min_wind"])
+        })
+
+    # Write XML to file
+    tree = ET.ElementTree(weather_el)
+    ET.indent(tree, space="  ", level=0)
+    tree.write(output_file, encoding="utf-8", xml_declaration=True)
+    print(f"✅ XML file written to {output_file}")
+
+def main():
+    data_by_city = {}
+
+    for city_folder in os.listdir(DATA_DIR):
+        city_path = os.path.join(DATA_DIR, city_folder)
+        if os.path.isdir(city_path):
+            stats = parse_city_weather(city_path)
+            if stats:
+                data_by_city[city_folder] = stats
+
+    build_xml(data_by_city, OUTPUT_FILE)
+
+if __name__ == "__main__":
+    main()
+
+##### Output #####
+
+<?xml version='1.0' encoding='utf-8'?>
+<weather country="Barcelona" date="2021-09-25">
+  <summary mean_temp="20.43" mean_wind_speed="2.11" coldest_place="Valladolid" warmest_place="Palma" windiest_place="Pamplona" />
+  <cities>
+    <Barcelona mean_temp="24.21" max_temp="27.38" min_temp="21.66" mean_wind_speed="1.26" max_wind_speed="3.6" min_wind_speed="0.45" />
+    <Logrono mean_temp="19.13" max_temp="23.77" min_temp="16.35" mean_wind_speed="2.67" max_wind_speed="7.72" min_wind_speed="1.03" />
+    <Madrid mean_temp="17.89" max_temp="21.35" min_temp="14.66" mean_wind_speed="2.65" max_wind_speed="4.92" min_wind_speed="0.45" />
+    <Merida mean_temp="19.53" max_temp="24.54" min_temp="15.38" mean_wind_speed="2.88" max_wind_speed="4.62" min_wind_speed="1.2" />
+    <Murcia mean_temp="25.64" max_temp="30.26" min_temp="22.64" mean_wind_speed="1.16" max_wind_speed="4.02" min_wind_speed="0.42" />
+    <Oviedo mean_temp="17.0" max_temp="21.96" min_temp="14.26" mean_wind_speed="1.54" max_wind_speed="6.26" min_wind_speed="0.17" />
+    <Palma mean_temp="26.21" max_temp="30.37" min_temp="22.91" mean_wind_speed="1.66" max_wind_speed="6.26" min_wind_speed="0.45" />
+    <Pamplona mean_temp="20.45" max_temp="25.76" min_temp="16.01" mean_wind_speed="4.03" max_wind_speed="9.26" min_wind_speed="0.51" />
+    <Santa Cruz de Tenerife mean_temp="22.18" max_temp="25.25" min_temp="19.63" mean_wind_speed="1.91" max_wind_speed="4.02" min_wind_speed="0.45" />
+    <Santander mean_temp="19.85" max_temp="23.28" min_temp="16.92" mean_wind_speed="2.03" max_wind_speed="4.02" min_wind_speed="0.45" />
+    <Santiago de Compostela mean_temp="16.18" max_temp="19.84" min_temp="13.67" mean_wind_speed="1.77" max_wind_speed="4.02" min_wind_speed="0" />
+    <Seville mean_temp="21.6" max_temp="27.13" min_temp="17.24" mean_wind_speed="1.04" max_wind_speed="2.24" min_wind_speed="0.45" />
+    <Toledo mean_temp="19.52" max_temp="23.49" min_temp="16.11" mean_wind_speed="3.86" max_wind_speed="7.04" min_wind_speed="1.34" />
+    <Valencia mean_temp="23.31" max_temp="27.57" min_temp="20.9" mean_wind_speed="1.45" max_wind_speed="4.47" min_wind_speed="0.45" />
+    <Valladolid mean_temp="15.61" max_temp="19.51" min_temp="12.56" mean_wind_speed="2.22" max_wind_speed="8.23" min_wind_speed="0.45" />
+    <Vitoria-Gasteiz mean_temp="17.89" max_temp="22.95" min_temp="14.73" mean_wind_speed="1.99" max_wind_speed="7.2" min_wind_speed="0.45" />
+    <Zaragoza mean_temp="21.16" max_temp="26.61" min_temp="16.92" mean_wind_speed="1.8" max_wind_speed="4.63" min_wind_speed="0.45" />
+  </cities>
+</weather>
