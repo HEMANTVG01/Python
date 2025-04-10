@@ -24,33 +24,12 @@ def generate_words(n=20):
     return words
 
 ############
-import random
-import string
+input = ['abc', 'def', 'xyz']
 
-def generate_words(num_words=5, word_length=3):
-    words = []
-    for _ in range(num_words):
-        word = ''.join(random.choices(string.ascii_lowercase, k=word_length))
-        words.append(word)
-    return words
+f1 = open('utf.txt', 'wb') 
+for i in input:
+    f1.write(i.encode('utf-8'))
 
-def write_words_to_files(words):
-    with open('file1.txt', 'w', encoding='utf-8') as file1:
-        file1.write('\n'.join(words))
-    with open('file2.txt', 'w', encoding='cp1252') as file2:
-        file2.write(','.join(reversed(words)))
-
-words = generate_words()
-write_words_to_files(words)
-print("Files written: file1.txt (UTF-8), file2.txt (CP1252)")
-
-
-########
-#file1.txt = knv
-byb
-vqg
-dud
-hdd
-
-#file2.txt
-hdd,dud,vqg,byb,knv
+f2 = open('cp.txt', 'wb')
+for j in input:
+    f2.write(j.encode('CP1252') + b',')
