@@ -13,30 +13,24 @@ Example:
 
     result.txt(content: "23, 78, 3")
 """
+############
 
+f1 = open('file1.txt', 'w')
+f1.write('23')
+f1.close()
 
-import os
+f2 = open('file2.txt', 'w')
+f2.write('78')
+f2.close()
 
-def extract_values_and_write():
-    directory_path = '/Users/hhemantvg/Documents/Python/Python_task_2/files'
-    values = []
-    
-    for filename in os.listdir(directory_path):
-        file_path = os.path.join(directory_path, filename)
-        
-        if os.path.isfile(file_path):
-            try:
-                with open(file_path, 'r') as file:
-                    content = file.read().strip() 
-                    if content:  
-                        values.append(content)
-            except Exception as e:
-                print(f"Error reading file {filename}: {e}")
+f3 = open('file3.txt', 'w')
+f3.write('3')
+f3.close()
 
-    with open('result.txt', 'w') as result_file:
-        result_file.write(', '.join(values))
-    
-    return values 
+with open('file1.txt', 'r') as f1, open('file2.txt', 'r') as f2, open('file3.txt', 'r') as f3:
+    r1 = f1.read().strip()
+    r2 = f2.read().strip()
+    r3 = f3.read().strip()
 
-extracted_values = extract_values_and_write()
-print("Extracted values:", ', '.join(extracted_values))
+with open('result.txt', 'w') as final:
+    final.write(f"{f1},{f2},{f3}")
