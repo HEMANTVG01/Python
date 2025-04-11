@@ -3,37 +3,47 @@ Write tests for classes in 2_python_part_2/task_classes.py (Homework, Teacher, S
 Check if all methods working correctly.
 Also check corner-cases, for example if homework number of days is negative.
 """
-
-
+#####
+import pytest
 import datetime
+from time import sleep
 
-class Homework:
-    def __init__(self, text, number_of_days):
-        self.text = text
-        self.deadline = datetime.timedelta(days=number_of_days)
-        self.created = datetime.datetime.now()
+from your_module_name import Homework, Student, Teacher  # replace with actual module name
 
-    def is_active(self):
-        current_date = self.created + self.deadline
-        return datetime.datetime.now() <= current_date
+def test_homework_creation():
+    hw = Homework("Test Homework", 3)
+    assert hw.text == "Test Homework"
+    assert isinstance(hw.deadline, datetime.timedelta)
+    assert hw.deadline.days == 3
+    assert isinstance(hw.created, datetime.datetime)
 
+def test_homework_is_active():
+    hw_active = Homework("Active Homework", 1)
+    assert hw_active.is_active() is True
 
-class Student:
-    def __init__(self, last_name, first_name):
-        self.last_name = last_name
-        self.first_name = first_name
+    # Creating homework with negative deadline, should be inactive
+    hw_expired = Homework("Expired Homework", -1)
+    assert hw_expired.is_active() is False
 
-    def do_homework(self, homework):
-        if homework.is_active():
-            print(f"{self.first_name} {self.last_name} is doing homework: {homework.text}")
-        else:
-            print(f"{self.first_name} {self.last_name}, You are too late for homework: {homework.text}")
+def test_teacher_create_homework():
+    teacher = Teacher("Doe", "John")
+    hw = teacher.create_homework("Learn Python", 2)
+    assert isinstance(hw, Homework)
+    assert hw.text == "Learn Python"
+    assert hw.deadline.days == 2
 
+def test_student_do_homework_active(capsys):
+    student = Student("Smith", "Anna")
+    hw = Homework("Write Essay", 1)
+    student.do_homework(hw)
+    
+    captured = capsys.readouterr()
+    assert "Anna Smith is doing homework" in captured.out
 
-class Teacher:
-    def __init__(self, last_name, first_name):
-        self.last_name = last_name
-        self.first_name = first_name
-
-    def create_homework(self, text, number_of_days):
-        return Homework(text, number_of_days)
+def test_student_do_homework_expired(capsys):
+    student = Student("Sharma", "Ravi")
+    hw = Homework("Old Task", -2)
+    student.do_homework(hw)
+    
+    captured = capsys.readouterr()
+    assert "Ravi Sharma, You are too late" in captured.out
