@@ -32,4 +32,4 @@ def get_min_max(filename):
             max_val = max(max_val, num)
     return (min_val, max_val)
 
-print(get_min_max('file.txt'))
+print(get_min_max('/Users/hhemantvg/Documents/Python_Module1_Tasks/Python_part_1/file.txt'))
